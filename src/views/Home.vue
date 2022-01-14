@@ -46,6 +46,10 @@
               :close-on-select="false"
               :clear-on-select="false"
             >
+              <template slot="option" slot-scope="{ option }">
+                {{ option === false ? "false" : option }}
+              </template>
+
               <template slot="selection" slot-scope="{ values }">
                 <span class="multiselect__single" v-if="values.length">
                   Выбрано {{ functype(values, i) }}
@@ -116,6 +120,10 @@ export default {
       if (status) return res;
       else return "";
     },
+    max2saved: function () {
+      console.log("2");
+      return 2;
+    },
   },
   methods: {
     functype(values, index) {
@@ -180,6 +188,15 @@ export default {
       return result;
     },
     selectNewItem(event) {
+      if (this.maxSaved && this.countSaved + 1 < this.saved.length) {
+        this.countSaved++;
+      }
+
+      while (this.countSaved + 1 < this.saved.length) {
+        this.saved.pop();
+        this.maxSaved = false;
+      }
+
       this.value.push(event);
       this.saved.push(JSON.parse(JSON.stringify(this.value)));
       this.countSaved++;
@@ -196,7 +213,7 @@ export default {
           newArr.push(this.value[i]);
         }
       }
-      this.value = newArr;
+      this.value = JSON.parse(JSON.stringify(newArr));
       this.saved.push(JSON.parse(JSON.stringify(this.value)));
       this.countSaved++;
       if (this.countSaved > 10) {
@@ -206,22 +223,25 @@ export default {
       }
     },
     forwardCl() {
-      this.value = this.saved[this.countSaved + 1];
+      if (this.countSaved == -1 && this.maxSaved) {
+        this.countSaved++;
+      }
+
+      this.value = JSON.parse(JSON.stringify(this.saved[this.countSaved + 1]));
       this.countSaved++;
     },
     backCl() {
       if (this.countSaved != 0) {
-        this.value = this.saved[this.countSaved - 1];
+        this.value = JSON.parse(
+          JSON.stringify(this.saved[this.countSaved - 1])
+        );
         this.countSaved--;
-        console.log("1");
+        if (this.countSaved == 0 && this.maxSaved) {
+          this.countSaved--;
+        }
       } else if (this.countSaved == 0 && !this.maxSaved) {
         this.value = [];
         this.countSaved--;
-        console.log("2");
-      } else if (this.countSaved == 0 && this.maxSaved) {
-        this.value = this.saved[this.countSaved];
-        this.countSaved--;
-        console.log("3");
       }
     },
   },
