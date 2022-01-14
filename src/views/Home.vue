@@ -17,7 +17,6 @@
             value = [];
             saved = [];
             countSaved = -1;
-            maxSaved = false;
           "
         >
           Сбросить
@@ -89,10 +88,8 @@ export default {
       flatArr: null,
       splitArr: null,
       value: [],
-
       saved: [],
       countSaved: -1,
-      maxSaved: false,
     };
   },
   components: { multiselect },
@@ -121,8 +118,9 @@ export default {
       else return "";
     },
     max2saved: function () {
-      console.log("2");
-      return 2;
+      if (this.saved.length > 10) {
+        return true;
+      } else return false;
     },
   },
   methods: {
@@ -188,13 +186,12 @@ export default {
       return result;
     },
     selectNewItem(event) {
-      if (this.maxSaved && this.countSaved + 1 < this.saved.length) {
+      if (this.max2saved && this.countSaved + 1 < this.saved.length) {
         this.countSaved++;
       }
 
       while (this.countSaved + 1 < this.saved.length) {
         this.saved.pop();
-        this.maxSaved = false;
       }
 
       this.value.push(event);
@@ -203,7 +200,6 @@ export default {
       if (this.countSaved > 10) {
         this.saved.shift();
         this.countSaved--;
-        this.maxSaved = true;
       }
     },
     removeNewItem(event) {
@@ -219,11 +215,10 @@ export default {
       if (this.countSaved > 10) {
         this.saved.shift();
         this.countSaved--;
-        this.maxSaved = true;
       }
     },
     forwardCl() {
-      if (this.countSaved == -1 && this.maxSaved) {
+      if (this.countSaved == -1 && this.max2saved) {
         this.countSaved++;
       }
 
@@ -236,10 +231,10 @@ export default {
           JSON.stringify(this.saved[this.countSaved - 1])
         );
         this.countSaved--;
-        if (this.countSaved == 0 && this.maxSaved) {
+        if (this.countSaved == 0 && this.max2saved) {
           this.countSaved--;
         }
-      } else if (this.countSaved == 0 && !this.maxSaved) {
+      } else if (this.countSaved == 0 && !this.max2saved) {
         this.value = [];
         this.countSaved--;
       }
